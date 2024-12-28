@@ -4,6 +4,23 @@ source "${BASH_SOURCE%/*}/logging.sh"
 source "${BASH_SOURCE%/*}/config.sh"
 source "${BASH_SOURCE%/*}/../ui/menu.sh"
 
+create_profile_wrapper() {
+    local profile_name="$1"
+    local wrapper_dir="$NVPM_ROOT/wrappers"
+    local wrapper_path="$wrapper_dir/$profile_name"
+
+    mkdir -p "$wrapper_dir"
+
+    cat << EOF > "$wrapper_path"
+#!/usr/bin/env bash
+export NVIM_APPNAME="nvpm/$profile_name"
+/usr/bin/nvim "\$@"
+EOF
+
+    chmod +x "$wrapper_path"
+    log_success "Profile wrapper created: $wrapper_path"
+}
+
 create_profile() {
     local profile_name="$1"
     
@@ -28,26 +45,26 @@ create_profile() {
         return 1
     fi
 
-    local profile_dir="$CONFIG_DIR/$profile_name"
+    local config_dir="$HOME/.config/nvpm/$profile_name"
 
     case "$dist_type" in
         "vanilla")
-            create_vanilla_profile "$profile_dir"
+            create_vanilla_profile "$config_dir"
             ;;
         "astronvim")
-            install_astronvim "$profile_dir"
+            install_astronvim "$config_dir"
             ;;
         "nvchad")
-            install_nvchad "$profile_dir"
+            install_nvchad "$config_dir"
             ;;
         "lazyvim")
-            install_lazyvim "$profile_dir"
+            install_lazyvim "$config_dir"
             ;;
         "kickstart")
-            install_kickstart "$profile_dir"
+            install_kickstart "$config_dir"
             ;;
         "lunarvim")
-            install_lunarvim "$profile_name"
+            install_lunarvim "$config_dir"
             ;;
         *)
             log_error "Unknown distribution type: $dist_type"
@@ -55,10 +72,26 @@ create_profile() {
             ;;
     esac
 
-    # Create profile wrapper if not LunarVim (which creates its own wrapper)
-    if [ "$dist_type" != "lunarvim" ]; then
-        create_profile_wrapper "$profile_name"
-    fi
+    # Create profile wrapper script
+    create_profile_wrapper "$profile_name"
 
     log_success "Profile '$profile_name' created successfully!"
+}
+
+global_profile() {
+    local profile_name="$1"
+    local wrapper_path="$NVPM_ROOT/wrappers/$profile_name"
+    local nvim_symlink="/usr/local/bin/nvim"
+
+    if [ ! -f "$wrapper_path" ]; then
+        log_error "Profile wrapper does not exist for '$profile_name'"
+        return 1
+    fi
+
+    if [ -L "$nvim_symlink" ]; then
+        rm "$nvim_symlink"
+    fi
+
+    ln -s "$wrapper_path" "$nvim_symlink"
+    log_success "Switched to profile '$profile_name' globally"
 }

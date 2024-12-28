@@ -35,6 +35,7 @@ NVPM_BIN="$NVPM_ROOT/bin"
 NVPM_SRC="$NVPM_ROOT/src"
 LOCAL_BIN="$HOME/.local/bin"
 NVPM_CACHE="$NVPM_ROOT/cache"
+NVPM_WRAPPERS="$NVPM_ROOT/wrappers"
 
 # Repository URL
 NVPM_REPO="https://github.com/steven-mosley/nvpm.git"
@@ -95,7 +96,7 @@ install_nvpm() {
     log_info "Installing NVPM..."
 
     # Create necessary directories
-    mkdir -p "$NVPM_ROOT" "$NVPM_BIN" "$NVPM_SRC" "$LOCAL_BIN"
+    mkdir -p "$NVPM_ROOT" "$NVPM_BIN" "$NVPM_SRC" "$LOCAL_BIN" "$NVPM_WRAPPERS"
 
     # Clone the repository into the cache directory
     if [ -d "$NVPM_CACHE/nvpm" ]; then

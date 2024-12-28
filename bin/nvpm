@@ -81,8 +81,8 @@ main() {
             "list")
                 list_profiles
                 ;;
-            "switch")
-                switch_profile "${@:2}"
+            "global")
+                global_profile "${@:2}"
                 ;;
             "remove")
                 remove_profile "${@:2}"

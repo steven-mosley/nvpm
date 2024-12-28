@@ -2,13 +2,15 @@
 
 set -e
 
-# Load configuration and logging
-source "${BASH_SOURCE%/*}/../src/core/config.sh"
-source "${BASH_SOURCE%/*}/../src/core/logging.sh"
-source "${BASH_SOURCE%/*}/../src/core/profile.sh"
-
-# Set NVPM_CACHE if not already set
+# Set NVPM_ROOT and NVPM_CACHE if not already set
+NVPM_ROOT="${NVPM_ROOT:-$HOME/.nvpm}"
 NVPM_CACHE="${NVPM_CACHE:-$NVPM_ROOT/cache}"
+NVPM_SRC="${NVPM_SRC:-$NVPM_ROOT/src}"
+
+# Load configuration and logging
+source "$NVPM_SRC/core/config.sh"
+source "$NVPM_SRC/core/logging.sh"
+source "$NVPM_SRC/core/profile.sh"
 
 # Fetch the latest scripts from GitHub
 fetch_latest_scripts() {

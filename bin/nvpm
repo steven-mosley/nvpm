@@ -55,7 +55,12 @@ execute_script() {
     local script="$1"
 
     if [ -f "$NVPM_CACHE/nvpm/bin/$script" ]; then
-        bash "$NVPM_CACHE/nvpm/bin/$script" "${@:2}"
+        # Avoid infinite loop by not fetching scripts again within the executed script
+        if [ "$script" != "nvpm" ]; then
+            bash "$NVPM_CACHE/nvpm/bin/$script" "${@:2}"
+        else
+            bash "$NVPM_CACHE/nvpm/bin/$script" "${@:2}" --skip-fetch
+        fi
     else
         log_error "Script '$script' not found in the fetched repository"
         exit 1
@@ -64,8 +69,11 @@ execute_script() {
 
 # Main entry point
 main() {
-    # Fetch the latest scripts
-    fetch_latest_scripts
+    # Check if the fetch should be skipped
+    if [[ " $* " != *" --skip-fetch "* ]]; then
+        # Fetch the latest scripts
+        fetch_latest_scripts
+    fi
 
     # Execute the main NVPM script
     execute_script "nvpm" "$@"

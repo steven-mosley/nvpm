@@ -155,7 +155,7 @@ list_profiles() {
     local found_profiles=0
     
     for dir in "$CONFIG_DIR"/*; do
-        if [ -d "$dir" ];            fi
+        if [ -d "$dir" ]; then
             profile_name=$(basename "$dir")
             
             # Check if this is a valid NVPM profile
@@ -267,7 +267,7 @@ restore_profiles() {
     if ! tar -tzf "$backup_file" >/dev/null 2>&1; then
         log_error "Invalid backup file"
         return 1
-    }
+    fi
     
     log_warning "This will overwrite existing profiles with the same names."
     read -p "Continue? [y/N] " -n 1 -r
@@ -358,7 +358,7 @@ _nvpm_complete() {
     
     case "$prev" in
         "nvpm")
-            COMPREPLY=($(compgen -W "setup create list switch current doctor clean export import backup restore health version help" -- "$cur"))
+            COMPREPLY=($(compgen -W "create list switch current doctor clean export import backup restore health version help" -- "$cur"))
             ;;
         "switch"|"export"|"health")
             # List available profiles
@@ -389,7 +389,7 @@ _nvpm_complete() {
     
     case "$prev" in
         "nvpm")
-            reply=("setup" "create" "list" "switch" "current" "doctor" "clean" "export" "import" "backup" "restore" "health" "version" "help")
+            reply=("create" "list" "switch" "current" "doctor" "clean" "export" "import" "backup" "restore" "health" "version" "help")
             ;;
         "switch"|"export"|"health")
             # List available profiles
@@ -410,7 +410,7 @@ function __nvpm_complete
     set -l cmd (commandline -opc)
     switch (count $cmd)
         case 1
-            echo "setup create list switch current doctor clean export import backup restore health version help"
+            echo "create list switch current doctor clean export import backup restore health version help"
         case 2
             switch (string match -r '^nvpm (switch|export|health)' $cmd)
                 case '*'
@@ -430,7 +430,6 @@ usage() {
     echo "Usage: nvpm <command> [options]"
     echo
     echo "Commands:"
-    echo "  setup                   Set up NVPM and initialize the environment"
     echo "  create <profile>        Create a new Neovim profile"
     echo "  list                    List available Neovim profiles"
     echo "  switch <profile>        Switch to a specific Neovim profile"
@@ -448,9 +447,6 @@ usage() {
 
 # Main Entry Point
 case "$1" in
-    "setup")
-        setup_nvpm
-        ;;
     "create")
         create_profile "$2"
         ;;

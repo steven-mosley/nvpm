@@ -134,6 +134,7 @@ main() {
                 usage
                 ;;
             *)
+                # Display error message and usage, do not re-run the script
                 log_error "Unknown command: $1"
                 usage
                 exit 1

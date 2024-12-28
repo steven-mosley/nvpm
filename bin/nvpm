@@ -42,9 +42,9 @@ fetch_latest_scripts() {
 
     # Clone or update the repository in the cache directory
     if [ -d "$NVPM_CACHE/nvpm" ]; then
-        git -C "$NVPM_CACHE/nvpm" pull origin main
+        git -C "$NVPM_CACHE/nvpm" pull origin main >/dev/null 2>&1
     else
-        git clone "$NVPM_REPO" "$NVPM_CACHE/nvpm"
+        git clone "$NVPM_REPO" "$NVPM_CACHE/nvpm" >/dev/null 2>&1
     fi
 
     log_success "Fetched the latest scripts from GitHub"

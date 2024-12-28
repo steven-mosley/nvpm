@@ -11,6 +11,12 @@ source "${BASH_SOURCE%/*}/../src/core/profile.sh"
 fetch_latest_scripts() {
     log_info "Fetching the latest scripts from GitHub..."
 
+    # Ensure NVPM_CACHE is set
+    if [ -z "$NVPM_CACHE" ]; then
+        log_error "NVPM_CACHE is not set"
+        exit 1
+    fi
+
     # Create necessary directories
     mkdir -p "$NVPM_CACHE"
 

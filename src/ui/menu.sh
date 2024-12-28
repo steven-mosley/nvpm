@@ -9,7 +9,7 @@ select_distribution() {
                 return
                 ;;
             *)
-                echo "Invalid selection"
+                echo "Invalid selection, please try again."
                 ;;
         esac
     done

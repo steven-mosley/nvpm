@@ -17,22 +17,16 @@ fi
 
 select_distribution() {
     local options=("vanilla" "astronvim" "nvchad" "lazyvim" "kickstart" "lunarvim")
-    local PS3="Please select a distribution (1-${#options[@]}): "  # Add a custom prompt
+    local PS3="Please select a distribution (1-${#options[@]}): "
     local choice
 
-    echo "Select a distribution:"
+    # Don't echo "Select a distribution:" here since it's getting mixed into the return value
     select choice in "${options[@]}"; do
-        if [[ " ${options[@]} " =~ " ${choice} " ]]; then
-            # Valid selection made
-            echo "$choice"
+        if [[ -n "$choice" ]]; then
+            printf "%s" "$choice"  # Use printf instead of echo to avoid newline issues
             return 0
-        elif [[ -n "$REPLY" ]]; then
-            # Check if the user entered the name directly
-            if [[ " ${options[@]} " =~ " ${REPLY,,} " ]]; then
-                echo "${REPLY,,}"
-                return 0
-            fi
-            echo "Invalid selection. Please choose a number between 1 and ${#options[@]}"
+        else
+            echo "Invalid selection. Please enter a number between 1 and ${#options[@]}"
         fi
     done
 }

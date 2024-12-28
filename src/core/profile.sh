@@ -39,12 +39,16 @@ create_profile() {
 
     # Select distribution type
     local dist_type
+    echo "Select a distribution:"  # Move this here instead of in select_distribution
     dist_type=$(select_distribution)
+    dist_type=$(echo "$dist_type" | tr -d '[:space:]')  # Remove any whitespace
     
     if [ -z "$dist_type" ]; then
         log_error "No distribution type selected"
         return 1
     fi
+
+    log_info "Selected distribution: $dist_type"
 
     local config_dir="$HOME/.config/nvpm/$profile_name"
 
@@ -68,7 +72,7 @@ create_profile() {
             install_lunarvim "$config_dir"
             ;;
         *)
-            log_error "Unknown distribution type: $dist_type"
+            log_error "Unknown distribution type: '$dist_type'"
             return 1
             ;;
     esac

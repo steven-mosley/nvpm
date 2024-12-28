@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 
-source "${BASH_SOURCE%/*}/../core/logging.sh"
-source "${BASH_SOURCE%/*}/../core/config.sh"
+# Get the directory of the current script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Source core scripts
+source "$SCRIPT_DIR/../core/logging.sh"
+source "$SCRIPT_DIR/../core/config.sh"
 
 install_astronvim() {
     local profile_dir="$1"

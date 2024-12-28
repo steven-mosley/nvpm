@@ -6,6 +6,7 @@ set -e
 NVPM_ROOT="$HOME/.nvpm"
 NVPM_BIN="$NVPM_ROOT/bin"
 NVPM_CACHE="$NVPM_ROOT/cache"
+NVPM_PROFILES="$NVPM_ROOT/profiles"
 NVPM_REPO="https://github.com/steven-mosley/nvpm.git"
 NVPM_VERSION="0.1.0"
 
@@ -62,6 +63,16 @@ execute_script() {
     fi
 }
 
+# List all available profiles
+list_profiles() {
+    if [ -d "$NVPM_PROFILES" ]; then
+        log_info "Available Neovim profiles:"
+        ls -1 "$NVPM_PROFILES"
+    else
+        log_warning "No profiles directory found. Create a profile first."
+    fi
+}
+
 # Show usage information
 usage() {
     cat << EOF
@@ -105,7 +116,7 @@ main() {
                 execute_script "nvpm" "create" "${@:2}"
                 ;;
             "list")
-                execute_script "nvpm" "list" "${@:2}"
+                list_profiles
                 ;;
             "switch")
                 execute_script "nvpm" "switch" "${@:2}"

@@ -2,76 +2,10 @@
 
 set -e
 
-# Define variables
-NVPM_ROOT="$HOME/.nvpm"
-NVPM_BIN="$NVPM_ROOT/bin"
-NVPM_CACHE="$NVPM_ROOT/cache"
-NVPM_PROFILES="$NVPM_ROOT/profiles"
-NVPM_REPO="https://github.com/steven-mosley/nvpm.git"
-NVPM_VERSION="0.1.0"
-
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
-# Logging functions
-log_info() {
-    echo -e "${BLUE}INFO:${NC} $1"
-}
-
-log_success() {
-    echo -e "${GREEN}SUCCESS:${NC} $1"
-}
-
-log_warning() {
-    echo -e "${YELLOW}WARNING:${NC} $1"
-}
-
-log_error() {
-    echo -e "${RED}ERROR:${NC} $1" >&2
-}
-
-# Fetch the latest scripts from GitHub
-fetch_latest_scripts() {
-    log_info "Fetching the latest scripts from GitHub..."
-
-    # Create necessary directories
-    mkdir -p "$NVPM_CACHE"
-
-    # Clone or update the repository in the cache directory
-    if [ -d "$NVPM_CACHE/nvpm" ]; then
-        git -C "$NVPM_CACHE/nvpm" pull origin main >/dev/null 2>&1
-    else
-        git clone "$NVPM_REPO" "$NVPM_CACHE/nvpm" >/dev/null 2>&1
-    fi
-
-    log_success "Fetched the latest scripts from GitHub"
-}
-
-# Execute the main script from the fetched repository
-execute_script() {
-    local script="$1"
-
-    if [ -f "$NVPM_CACHE/nvpm/bin/$script" ]; then
-        bash "$NVPM_CACHE/nvpm/bin/$script" "${@:2}"
-    else
-        log_error "Script '$script' not found in the fetched repository"
-        exit 1
-    fi
-}
-
-# List all available profiles
-list_profiles() {
-    if [ -d "$NVPM_PROFILES" ]; then
-        log_info "Available Neovim profiles:"
-        ls -1 "$NVPM_PROFILES"
-    else
-        log_warning "No profiles directory found. Create a profile first."
-    fi
-}
+# Load configuration and logging
+source "${BASH_SOURCE%/*}/../src/core/config.sh"
+source "${BASH_SOURCE%/*}/../src/core/logging.sh"
+source "${BASH_SOURCE%/*}/../src/core/profile.sh"
 
 # Show usage information
 usage() {
@@ -81,13 +15,13 @@ NVPM - Neovim Profile Manager v${NVPM_VERSION}
 Usage: nvpm <command> [options]
 
 Commands:
-    create <name>     Create a new Neovim profile
-    list              List all available profiles
-    switch <name>     Switch to a specific profile
-    remove <name>     Remove a profile
-    current           Show current active profile
-    version           Show NVPM version
-    help              Show this help message
+    create <name>                  Create a new Neovim profile
+    list                           List all available profiles
+    switch <name>                  Switch to a specific profile
+    remove <name>                  Remove a profile
+    current                        Show current active profile
+    version                        Show NVPM version
+    help                           Show this help message
 
 Examples:
     nvpm create my-config
@@ -113,19 +47,19 @@ main() {
         # Execute the appropriate command
         case "$1" in
             "create")
-                execute_script "nvpm" "create" "${@:2}"
+                create_profile "${@:2}"
                 ;;
             "list")
                 list_profiles
                 ;;
             "switch")
-                execute_script "nvpm" "switch" "${@:2}"
+                switch_profile "${@:2}"
                 ;;
             "remove")
-                execute_script "nvpm" "remove" "${@:2}"
+                remove_profile "${@:2}"
                 ;;
             "current")
-                execute_script "nvpm" "current" "${@:2}"
+                current_profile
                 ;;
             "version")
                 echo "nvpm version $NVPM_VERSION"

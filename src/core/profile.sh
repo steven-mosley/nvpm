@@ -113,3 +113,57 @@ EOF
 
     log_success "Created Neovim wrapper: nvim-$profile_name"
 }
+
+list_profiles() {
+    if [ -d "$NVPM_PROFILES" ]; then
+        log_info "Available Neovim profiles:"
+        ls -1 "$NVPM_PROFILES"
+    else
+        log_warning "No profiles directory found. Create a profile first."
+    fi
+}
+
+switch_profile() {
+    local profile_name="$1"
+
+    if [ -z "$profile_name" ]; then
+        log_error "Profile name is required"
+        return 1
+    fi
+
+    if [ ! -d "$NVPM_PROFILES/$profile_name" ]; then
+        log_error "Profile '$profile_name' does not exist"
+        return 1
+    fi
+
+    rm -rf "$NVIM_CONFIG_DIR"
+    ln -s "$NVPM_PROFILES/$profile_name" "$NVIM_CONFIG_DIR"
+    log_success "Switched to profile '$profile_name'"
+}
+
+remove_profile() {
+    local profile_name="$1"
+
+    if [ -z "$profile_name" ]; then
+        log_error "Profile name is required"
+        return 1
+    fi
+
+    if [ ! -d "$NVPM_PROFILES/$profile_name" ]; then
+        log_error "Profile '$profile_name' does not exist"
+        return 1
+    fi
+
+    rm -rf "$NVPM_PROFILES/$profile_name"
+    log_success "Profile '$profile_name' removed"
+}
+
+current_profile() {
+    if [ -L "$NVIM_CONFIG_DIR" ]; then
+        local current_profile
+        current_profile=$(readlink "$NVIM_CONFIG_DIR")
+        echo "Current active profile: $(basename "$current_profile")"
+    else
+        echo "No active profile"
+    fi
+}

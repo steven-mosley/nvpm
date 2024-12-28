@@ -103,9 +103,9 @@ install_nvpm() {
         git clone "$NVPM_REPO" "$NVPM_CACHE/nvpm" >/dev/null 2>&1
     fi
 
-    # Copy the latest binary to the bin directory
-    cp "$NVPM_CACHE/nvpm/bin/nvpm" "$NVPM_BIN/nvpm"
-    chmod +x "$NVPM_BIN/nvpm"
+    # Copy the latest binaries to the bin directory
+    cp "$NVPM_CACHE/nvpm/bin/"* "$NVPM_BIN/"
+    chmod +x "$NVPM_BIN/"*
 
     # Create symlink in local bin
     ln -sf "$NVPM_BIN/nvpm" "$LOCAL_BIN/nvpm"

@@ -42,6 +42,7 @@ create_profile() {
     dist_type=$(select_distribution)
     
     if [ -z "$dist_type" ]; then
+        log_error "No distribution type selected"
         return 1
     fi
 
@@ -78,7 +79,7 @@ create_profile() {
     log_success "Profile '$profile_name' created successfully!"
 }
 
-global_profile() {
+switch_profile() {
     local profile_name="$1"
     local wrapper_path="$NVPM_ROOT/wrappers/$profile_name"
     local nvim_symlink="/usr/local/bin/nvim"

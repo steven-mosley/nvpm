@@ -32,9 +32,7 @@ log_error() {
 # Base directories
 NVPM_ROOT="${NVPM_ROOT:-$HOME/.nvpm}"
 NVPM_BIN="$NVPM_ROOT/bin"
-NVPM_SRC="$NVPM_ROOT/src"
 LOCAL_BIN="$HOME/.local/bin"
-NVPM_CACHE="$NVPM_ROOT/cache"
 
 # Repository URL
 NVPM_REPO="https://github.com/steven-mosley/nvpm.git"
@@ -95,19 +93,19 @@ install_nvpm() {
     log_info "Installing NVPM..."
 
     # Create necessary directories
-    mkdir -p "$NVPM_ROOT" "$NVPM_BIN" "$NVPM_SRC" "$LOCAL_BIN"
+    mkdir -p "$NVPM_ROOT" "$NVPM_BIN" "$LOCAL_BIN"
 
     # Clone the repository into the cache directory
+    NVPM_CACHE="$NVPM_ROOT/cache"  # Ensure NVPM_CACHE is defined here
     if [ -d "$NVPM_CACHE/nvpm" ]; then
         git -C "$NVPM_CACHE/nvpm" pull origin main >/dev/null 2>&1
     else
         git clone "$NVPM_REPO" "$NVPM_CACHE/nvpm" >/dev/null 2>&1
     fi
 
-    # Copy the latest binaries and source files to their respective directories
-    cp "$NVPM_CACHE/nvpm/bin/"* "$NVPM_BIN/"
-    cp -r "$NVPM_CACHE/nvpm/src/"* "$NVPM_SRC/"
-    chmod +x "$NVPM_BIN/"*
+    # Copy the latest binary to the bin directory
+    cp "$NVPM_CACHE/nvpm/bin/nvpm" "$NVPM_BIN/nvpm"
+    chmod +x "$NVPM_BIN/nvpm"
 
     # Create symlink in local bin
     ln -sf "$NVPM_BIN/nvpm" "$LOCAL_BIN/nvpm"

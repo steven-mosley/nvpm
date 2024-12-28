@@ -55,16 +55,37 @@ execute_script() {
     local script="$1"
 
     if [ -f "$NVPM_CACHE/nvpm/bin/$script" ]; then
-        # Avoid infinite loop by not fetching scripts again within the executed script
-        if [ "$script" != "nvpm" ]; then
-            bash "$NVPM_CACHE/nvpm/bin/$script" "${@:2}"
-        else
-            bash "$NVPM_CACHE/nvpm/bin/$script" "${@:2}" --skip-fetch
-        fi
+        bash "$NVPM_CACHE/nvpm/bin/$script" "${@:2}"
     else
         log_error "Script '$script' not found in the fetched repository"
         exit 1
     fi
+}
+
+# Show usage information
+usage() {
+    cat << EOF
+NVPM - Neovim Profile Manager v${NVPM_VERSION}
+
+Usage: nvpm <command> [options]
+
+Commands:
+    create <name>     Create a new Neovim profile
+    list              List all available profiles
+    switch <name>     Switch to a specific profile
+    remove <name>     Remove a profile
+    current           Show current active profile
+    version           Show NVPM version
+    help              Show this help message
+
+Examples:
+    nvpm create my-config
+    nvpm list
+    nvpm switch my-config
+    nvpm remove my-config
+
+For more information, visit: https://github.com/steven-mosley/nvpm
+EOF
 }
 
 # Main entry point
@@ -73,10 +94,41 @@ main() {
     if [[ " $* " != *" --skip-fetch "* ]]; then
         # Fetch the latest scripts
         fetch_latest_scripts
+        # Re-run the script with --skip-fetch to prevent fetching again
+        exec "$0" "$@" --skip-fetch
+    else
+        # Remove the --skip-fetch flag from the arguments
+        set -- "${@/--skip-fetch/}"
+        # Execute the appropriate command
+        case "$1" in
+            "create")
+                execute_script "nvpm" "create" "${@:2}"
+                ;;
+            "list")
+                execute_script "nvpm" "list" "${@:2}"
+                ;;
+            "switch")
+                execute_script "nvpm" "switch" "${@:2}"
+                ;;
+            "remove")
+                execute_script "nvpm" "remove" "${@:2}"
+                ;;
+            "current")
+                execute_script "nvpm" "current" "${@:2}"
+                ;;
+            "version")
+                echo "nvpm version $NVPM_VERSION"
+                ;;
+            "help"|"--help"|"-h"|"")
+                usage
+                ;;
+            *)
+                log_error "Unknown command: $1"
+                usage
+                exit 1
+                ;;
+        esac
     fi
-
-    # Execute the main NVPM script, excluding the --skip-fetch flag if present
-    execute_script "nvpm" "${@/--skip-fetch/}"
 }
 
 # Run the main function with all arguments

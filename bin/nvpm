@@ -75,8 +75,8 @@ main() {
         fetch_latest_scripts
     fi
 
-    # Execute the main NVPM script
-    execute_script "nvpm" "$@"
+    # Execute the main NVPM script, excluding the --skip-fetch flag if present
+    execute_script "nvpm" "${@/--skip-fetch/}"
 }
 
 # Run the main function with all arguments

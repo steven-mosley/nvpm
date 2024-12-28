@@ -95,85 +95,16 @@ install_nvpm() {
     # Create necessary directories
     mkdir -p "$NVPM_ROOT" "$NVPM_BIN" "$LOCAL_BIN"
 
-    # Write the wrapper script
-    cat > "$NVPM_BIN/nvpm" << 'EOF'
-#!/usr/bin/env bash
-
-set -e
-
-# Define variables
-NVPM_ROOT="$HOME/.nvpm"
-NVPM_BIN="$NVPM_ROOT/bin"
-NVPM_CACHE="$NVPM_ROOT/cache"
-NVPM_REPO="https://github.com/steven-mosley/nvpm.git"
-NVPM_VERSION="0.1.0"
-
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
-# Logging functions
-log_info() {
-    echo -e "${BLUE}INFO:${NC} $1"
-}
-
-log_success() {
-    echo -e "${GREEN}SUCCESS:${NC} $1"
-}
-
-log_warning() {
-    echo -e "${YELLOW}WARNING:${NC} $1"
-}
-
-log_error() {
-    echo -e "${RED}ERROR:${NC} $1" >&2
-}
-
-# Fetch the latest scripts from GitHub
-fetch_latest_scripts() {
-    log_info "Fetching the latest scripts from GitHub..."
-
-    # Create necessary directories
-    mkdir -p "$NVPM_CACHE"
-
-    # Clone or update the repository in the cache directory
+    # Clone the repository into the cache directory
+    NVPM_CACHE="$NVPM_ROOT/cache"
     if [ -d "$NVPM_CACHE/nvpm" ]; then
-        git -C "$NVPM_CACHE/nvpm" pull origin main
+        git -C "$NVPM_CACHE/nvpm" pull origin main >/dev/null 2>&1
     else
-        git clone "$NVPM_REPO" "$NVPM_CACHE/nvpm"
+        git clone "$NVPM_REPO" "$NVPM_CACHE/nvpm" >/dev/null 2>&1
     fi
 
-    log_success "Fetched the latest scripts from GitHub"
-}
-
-# Execute the main script from the fetched repository
-execute_script() {
-    local script="$1"
-
-    if [ -f "$NVPM_CACHE/nvpm/bin/$script" ]; then
-        bash "$NVPM_CACHE/nvpm/bin/$script" "${@:2}"
-    else
-        log_error "Script '$script' not found in the fetched repository"
-        exit 1
-    fi
-}
-
-# Main entry point
-main() {
-    # Fetch the latest scripts
-    fetch_latest_scripts
-
-    # Execute the main NVPM script
-    execute_script "nvpm" "$@"
-}
-
-# Run the main function with all arguments
-main "$@"
-EOF
-
+    # Copy the latest binary to the bin directory
+    cp "$NVPM_CACHE/nvpm/bin/nvpm" "$NVPM_BIN/nvpm"
     chmod +x "$NVPM_BIN/nvpm"
 
     # Create symlink in local bin

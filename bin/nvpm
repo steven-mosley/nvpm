@@ -61,8 +61,17 @@ exec_nvim() {
 
     local wrapper_script="$NVPM_ROOT/wrappers/$active_profile_name"
     if [ ! -f "$wrapper_script" ]; then
-        log_error "Wrapper script does not exist for profile: $active_profile_name"
-        exit 1
+        echo "ERROR: Wrapper script does not exist for profile: $active_profile_name"
+        read -p "Wrapper script $active_profile_name not found. Would you like to revert to system? (y/n) " response
+        if [[ "$response" == "y" || "$response" == "Y" ]]; then
+            echo "system" > "$NVPM_ROOT/global_profile"
+            echo "Global profile set to system. Launching nvim..."
+            exec /usr/bin/nvim "$@"
+        else
+            echo "Aborting..."
+            exit 1
+        fi
+        return
     fi
 
     echo "Executing wrapper script: $wrapper_script $@"  # Debug print

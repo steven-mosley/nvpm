@@ -15,10 +15,10 @@ source "$NVPM_SRC/ui/menu.sh"
 
 # Show usage information
 usage() {
-    cat << EOF
-${BLUE}${BOLD}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃         Neovim Profile Manager         ┃
-┃              v$(cat "$VERSION_FILE" 2>/dev/null || echo "0.1")                    ┃
+    echo -e \
+"${BLUE}${BOLD}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃         Neovim Profile Manager       ┃
+┃                 v$(cat "$VERSION_FILE" 2>/dev/null || echo "0.1")                 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}
 
 ${BOLD}Usage:${NC} nvpm ${YELLOW}<command>${NC} [options]
@@ -32,9 +32,9 @@ ${CYAN}${BOLD}Commands:${NC}
         ${GREEN}current${NC}                        Show current active profile
 
     ${MAGENTA}${BOLD}Profile Maintenance:${NC}
-        ${GREEN}clearstate${NC}                     Clear the state of a profile
-        ${GREEN}clearshare${NC}                     Clear the share of a profile
-        ${GREEN}clearcache${NC}                     Clear the cache of a profile
+        ${GREEN}clearstate${NC} ${YELLOW}<name>${NC}                    Clear the state of a profile
+        ${GREEN}clearshare${NC} ${YELLOW}<name>${NC}                    Clear the share of a profile
+        ${GREEN}clearcache${NC} ${YELLOW}<name>${NC}                    Clear the cache of a profile
 
 
     ${BLUE}${BOLD}Shim Executor:${NC}
@@ -51,8 +51,7 @@ ${YELLOW}${BOLD}Examples:${NC}
     nvpm remove my-config
     nvpm exec nvim${NC}
 
-${BOLD}For more information, visit:${NC} ${BLUE}${UNDERLINE}https://github.com/steven-mosley/nvpm${NC}
-EOF
+${BOLD}For more information, visit:${NC} ${BLUE}${UNDERLINE}https://github.com/steven-mosley/nvpm${NC}"
 }
 
 # Exec command to route through NVPM

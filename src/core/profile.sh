@@ -55,7 +55,9 @@ remove_profile() {
         rm -rf "$config_path"
     fi
 
-    log_success "Profile '$profile_name' removed successfully"
+    # Set the global profile to system
+    echo "system" > "$NVPM_ROOT/global_profile"
+    log_success "Profile '$profile_name' removed successfully and global profile set to system"
 }
 
 # Global profile switching

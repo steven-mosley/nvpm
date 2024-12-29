@@ -36,6 +36,7 @@ NVPM_SRC="$NVPM_ROOT/src"
 LOCAL_BIN="$HOME/.local/bin"
 NVPM_CACHE="$NVPM_ROOT/cache"
 NVPM_WRAPPERS="$NVPM_ROOT/wrappers"
+NVPM_SHIMS="$NVPM_ROOT/shims"
 
 # Repository URL
 NVPM_REPO="https://github.com/steven-mosley/nvpm.git"
@@ -87,7 +88,7 @@ setup_shell() {
             echo >> "$shell_config"
             echo '# NVPM initialization' >> "$shell_config"
             echo 'export NVPM_ROOT="$HOME/.nvpm"' >> "$shell_config"
-            echo 'export PATH="$NVPM_ROOT/bin:$PATH"' >> "$shell_config"
+            echo 'export PATH="$NVPM_ROOT/bin:$NVPM_ROOT/shims:$PATH"' >> "$shell_config"
         fi
     fi
 }
@@ -96,7 +97,7 @@ install_nvpm() {
     log_info "Installing NVPM..."
 
     # Create necessary directories
-    mkdir -p "$NVPM_ROOT" "$NVPM_BIN" "$NVPM_SRC" "$LOCAL_BIN" "$NVPM_WRAPPERS"
+    mkdir -p "$NVPM_ROOT" "$NVPM_BIN" "$NVPM_SRC" "$LOCAL_BIN" "$NVPM_WRAPPERS" "$NVPM_SHIMS"
 
     # Clone the repository into the cache directory
     if [ -d "$NVPM_CACHE/nvpm" ]; then
@@ -112,6 +113,16 @@ install_nvpm() {
 
     # Create symlink in local bin
     ln -sf "$NVPM_BIN/nvpm" "$LOCAL_BIN/nvpm"
+
+    # Create the initial shim script
+    cat << 'EOF' > "$NVPM_SHIMS/nvim"
+#!/usr/bin/env bash
+set -e
+
+export NVPM_ROOT="$HOME/.nvpm"
+exec "$NVPM_ROOT/bin/nvpm" exec nvim "$@"
+EOF
+    chmod +x "$NVPM_SHIMS/nvim"
 
     # Setup shell integration
     setup_shell

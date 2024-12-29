@@ -21,12 +21,9 @@ list_profiles() {
 
 # Show current active profile
 current_profile() {
-    local nvim_path
-    nvim_path=$(readlink -f "$(which nvim)")
-    
-    if [[ "$nvim_path" == *"$NVPM_ROOT/wrappers/"* ]]; then
+    if [ -f "$NVPM_ROOT/global_profile" ]; then
         local profile_name
-        profile_name=$(basename "$nvim_path")
+        profile_name=$(basename "$(cat "$NVPM_ROOT/global_profile")")
         log_info "Current profile: $profile_name"
     else
         log_info "No profile currently active"
@@ -70,30 +67,16 @@ global_profile() {
         return 1
     fi
 
-    local wrapper_path="$NVPM_ROOT/wrappers/$profile_name"
-    local nvim_path="/usr/bin/nvim"
+    local profile_path="$HOME/.config/nvpm/$profile_name"
 
-    if [ ! -f "$wrapper_path" ]; then
+    if [ ! -d "$profile_path" ]; then
         log_error "Profile '$profile_name' does not exist"
         return 1
     fi
 
-    # Check if we have write permissions for the nvim path
-    if [ ! -w "$(dirname "$nvim_path")" ]; then
-        log_error "Cannot write to $nvim_path. Try running with sudo."
-        return 1
-    fi
-
-    # Remove existing symlink if it exists
-    [ -L "$nvim_path" ] && rm "$nvim_path"
-
-    # Create new symlink
-    if ln -s "$wrapper_path" "$nvim_path"; then
-        log_success "Switched to profile '$profile_name' globally"
-    else
-        log_error "Failed to switch to profile '$profile_name'"
-        return 1
-    fi
+    # Set the global profile
+    echo "$profile_path" > "$NVPM_ROOT/global_profile"
+    log_success "Switched to profile '$profile_name' globally"
 }
 
 # Create a new profile wrapper

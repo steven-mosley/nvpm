@@ -7,7 +7,7 @@ NVPM_ROOT="${NVPM_ROOT:-$HOME/.nvpm}"
 NVPM_CACHE="${NVPM_CACHE:-$NVPM_ROOT/cache}"
 NVPM_SRC="${NVPM_SRC:-$NVPM_ROOT/src}"
 
-# Load configuration, logging, and menu
+# Load configuration, logging, and core functions
 source "$NVPM_SRC/core/config.sh"
 source "$NVPM_SRC/core/logging.sh"
 source "$NVPM_SRC/core/profile.sh"
@@ -49,17 +49,37 @@ Commands:
     global <name>                  Set a system wide global profile
     remove <name>                  Remove a profile
     current                        Show current active profile
+    exec <program>                 Execute the given program with the NVIM_APPNAME set
     version                        Show NVPM version
     help                           Show this help message
 
 Examples:
     nvpm create my-config
     nvpm list
-    nvpm switch my-config
+    nvpm global my-config
     nvpm remove my-config
+    nvpm exec nvim
 
 For more information, visit: https://github.com/steven-mosley/nvpm
 EOF
+}
+
+# Exec command to route through NVPM
+exec_nvim() {
+    local program="$1"
+    shift
+
+    # Determine the active profile (this can be extended to read from a config or similar)
+    if [ -f "$NVPM_ROOT/global_profile" ]; then
+        local active_profile
+        active_profile=$(cat "$NVPM_ROOT/global_profile")
+    else
+        log_error "No global profile set"
+        exit 1
+    fi
+    
+    export NVIM_APPNAME="nvpm/$(basename "$active_profile")"
+    exec /usr/bin/nvim "$@"
 }
 
 # Main entry point
@@ -89,6 +109,9 @@ main() {
                 ;;
             "current")
                 current_profile
+                ;;
+            "exec")
+                exec_nvim "${@:2}"
                 ;;
             "version")
                 echo "nvpm version $NVPM_VERSION"

@@ -23,7 +23,7 @@ list_profiles() {
 current_profile() {
     if [ -f "$NVPM_ROOT/global_profile" ]; then
         local profile_name
-        profile_name=$(basename "$(cat "$NVPM_ROOT/global_profile")")
+        profile_name=$(cat "$NVPM_ROOT/global_profile")
         log_info "Current profile: $profile_name"
     else
         log_info "No profile currently active"
@@ -67,15 +67,15 @@ global_profile() {
         return 1
     fi
 
-    local profile_path="$HOME/.config/nvpm/$profile_name"
+    local wrapper_path="$NVPM_ROOT/wrappers/$profile_name"
 
-    if [ ! -d "$profile_path" ]; then
+    if [ ! -f "$wrapper_path" ]; then
         log_error "Profile '$profile_name' does not exist"
         return 1
     fi
 
     # Set the global profile
-    echo "$profile_path" > "$NVPM_ROOT/global_profile"
+    echo "$profile_name" > "$NVPM_ROOT/global_profile"
     log_success "Switched to profile '$profile_name' globally"
 }
 
@@ -89,8 +89,8 @@ create_profile_wrapper() {
 
     cat << EOF > "$wrapper_path"
 #!/usr/bin/env bash
-export NVIM_APPNAME="nvpm/$profile_name"
-/usr/bin/nvim "\$@"
+set -e
+NVIM_APPNAME="$profile_name" exec /usr/bin/nvim "\$@"
 EOF
 
     chmod +x "$wrapper_path"

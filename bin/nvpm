@@ -70,16 +70,15 @@ exec_nvim() {
     shift
 
     # Determine the active profile (this can be extended to read from a config or similar)
-    if [ -f "$NVPM_ROOT/global_profile" ]; then
-        local active_profile
-        active_profile=$(cat "$NVPM_ROOT/global_profile")
-    else
-        log_error "No global profile set"
+    local active_profile_name
+    active_profile_name="$(cat "$NVPM_ROOT/global_profile" 2>/dev/null || echo "default")"
+    
+    if [ ! -f "$NVPM_ROOT/wrappers/$active_profile_name" ]; then
+        log_error "Wrapper script does not exist for profile: $active_profile_name"
         exit 1
     fi
     
-    export NVIM_APPNAME="nvpm/$(basename "$active_profile")"
-    exec /usr/bin/nvim "$@"
+    exec "$NVPM_ROOT/wrappers/$active_profile_name" "$@"
 }
 
 # Main entry point

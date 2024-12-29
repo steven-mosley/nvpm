@@ -17,7 +17,6 @@ source "$NVPM_SRC/core/update.sh"
 
 # Function to fetch the latest version information from GitHub
 fetch_latest_version_info() {
-    # Clone the repository to a temporary directory to fetch the latest version file
     local tmp_dir
     tmp_dir=$(mktemp -d)
     git clone --depth=1 "$NVPM_REPO" "$tmp_dir" >/dev/null 2>&1 || {
@@ -105,7 +104,7 @@ exec_nvim() {
 
 # Main entry point
 main() {
-    # Only check for updates if the command is not exec
+    # Check for updates only if the command is not exec
     if [[ "$1" != "exec" ]]; then
         check_for_updates
     fi

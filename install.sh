@@ -108,6 +108,7 @@ install_nvpm() {
 
     # Copy the latest binaries and source files to their respective directories
     cp "$NVPM_CACHE/nvpm/bin/"* "$NVPM_BIN/"
+    cp "$NVPM_CACHE/nvpm/version" "$NVPM_ROOT/"
     cp -r "$NVPM_CACHE/nvpm/src/"* "$NVPM_SRC/"
     chmod +x "$NVPM_BIN/"*
 

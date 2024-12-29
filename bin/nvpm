@@ -13,6 +13,7 @@ source "$NVPM_SRC/core/config.sh"
 source "$NVPM_SRC/core/logging.sh"
 source "$NVPM_SRC/core/profile.sh"
 source "$NVPM_SRC/ui/menu.sh"
+source "$NVPM_SRC/core/update.sh"
 
 # Function to fetch the latest version information from GitHub
 fetch_latest_version_info() {
@@ -134,7 +135,7 @@ main() {
             fi
             ;;
         "update")
-            "$NVPM_SRC/core/update.sh"
+            update_nvpm
             ;;
         "version")
             echo "nvpm version $(cat "$VERSION_FILE" 2>/dev/null || echo "0.1")"

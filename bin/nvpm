@@ -105,8 +105,10 @@ exec_nvim() {
 
 # Main entry point
 main() {
-    # Check for updates
-    check_for_updates
+    # Only check for updates if the command is not exec
+    if [[ "$1" != "exec" ]]; then
+        check_for_updates
+    fi
 
     # Execute the appropriate command
     case "$1" in

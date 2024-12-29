@@ -4,11 +4,11 @@ source "${BASH_SOURCE%/*}/logging.sh"
 source "${BASH_SOURCE%/*}/config.sh"
 source "${BASH_SOURCE%/*}/../ui/menu.sh"
 
-local wrapper_path="$NVPM_ROOT/wrappers/$profile_name"
-local config_path="$HOME/.config/nvpm/$profile_name"
-local cache_path="$HOME/.cache/nvpm/$profile_name"
-local state_path="$HOME/.local/state/nvpm/$profile_name"
-local share_path="$HOME/.local/share/nvpm/$profile_name"
+wrapper_path="$NVPM_ROOT/wrappers/$profile_name"
+config_path="$HOME/.config/nvpm/$profile_name"
+cache_path="$HOME/.cache/nvpm/$profile_name"
+state_path="$HOME/.local/state/nvpm/$profile_name"
+share_path="$HOME/.local/share/nvpm/$profile_name"
 
 # List available profiles
 list_profiles() {

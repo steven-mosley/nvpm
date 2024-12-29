@@ -71,7 +71,7 @@ global_profile() {
     fi
 
     local wrapper_path="$NVPM_ROOT/wrappers/$profile_name"
-    local nvim_path="/usr/local/bin/nvim"
+    local nvim_path="/usr/bin/nvim"
 
     if [ ! -f "$wrapper_path" ]; then
         log_error "Profile '$profile_name' does not exist"

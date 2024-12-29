@@ -90,7 +90,7 @@ create_profile_wrapper() {
     cat << EOF > "$wrapper_path"
 #!/usr/bin/env bash
 set -e
-NVIM_APPNAME="$profile_name" exec /usr/bin/nvim "\$@"
+NVIM_APPNAME="nvpm/$profile_name" exec /usr/bin/nvim "\$@"
 EOF
 
     chmod +x "$wrapper_path"

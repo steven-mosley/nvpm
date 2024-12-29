@@ -43,8 +43,9 @@ EOF
 
 # Exec command to route through NVPM
 exec_nvim() {
-    # Remove the local program and shift since we don't need them
-    # The wrapper script already knows to call nvim
+    # Since we know the first argument will be "nvim", we can ignore it
+    # and only pass additional arguments if they exist
+    shift  # Remove "nvim" from the arguments
 
     # Determine the active profile
     local active_profile_name
@@ -57,7 +58,12 @@ exec_nvim() {
     fi
 
     echo "Executing wrapper script: $wrapper_script $@"  # Debug print
-    exec "$wrapper_script" "$@"
+    # Only pass remaining arguments if they exist
+    if [ $# -eq 0 ]; then
+        exec "$wrapper_script"
+    else
+        exec "$wrapper_script" "$@"
+    fi
 }
 
 # Main entry point
@@ -81,11 +87,11 @@ main() {
             ;;
         "exec")
 	    if [[ "$2" == "nvim" ]]; then
-		exec_nvim "${@:2}"  # Changed from ${@:3} to ${@:2}
+    		exec_nvim "$2" "${@:3}"  # Changed from ${@:3} to ${@:2}
 	    else
-		log_error "Unknown exec target: $2"
-		usage
-		exit 1
+		    log_error "Unknown exec target: $2"
+		    usage
+		    exit 1
 	    fi
 	    ;;
         "version")

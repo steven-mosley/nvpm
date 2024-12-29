@@ -19,17 +19,37 @@ fetch_latest_version_info() {
     # Clone the repository to a temporary directory to fetch the latest version file
     local tmp_dir
     tmp_dir=$(mktemp -d)
-    git clone --depth=1 "$NVPM_REPO" "$tmp_dir" >/dev/null 2>&1
-    cat "$tmp_dir/version"
+    git clone --depth=1 "$NVPM_REPO" "$tmp_dir" >/dev/null 2>&1 || {
+        log_error "Failed to fetch the latest version information."
+        rm -rf "$tmp_dir"
+        return 1
+    }
+    
+    if [ -f "$tmp_dir/version" ]; then
+        cat "$tmp_dir/version"
+    else
+        log_error "Version file not found in the repository."
+        rm -rf "$tmp_dir"
+        return 1
+    fi
+
     rm -rf "$tmp_dir"
 }
 
 # Function to check for updates
 check_for_updates() {
     local remote_version local_version
-    remote_version=$(fetch_latest_version_info)
+
+    # Fetch remote version information
+    remote_version=$(fetch_latest_version_info) || return 1
+
+    # Check if local version file exists, if not create it with version 0.1
+    if [ ! -f "$VERSION_FILE" ]; then
+        echo "0.1" > "$VERSION_FILE"
+    fi
     local_version=$(cat "$VERSION_FILE")
 
+    # Compare versions and notify the user if an update is available
     if [ "$remote_version" != "$local_version" ]; then
         log_info "A new version ($remote_version) is available. Run 'nvpm update' to update."
     fi
@@ -38,7 +58,7 @@ check_for_updates() {
 # Show usage information
 usage() {
     cat << EOF
-NVPM - Neovim Profile Manager v$(cat "$VERSION_FILE")
+NVPM - Neovim Profile Manager v$(cat "$VERSION_FILE" 2>/dev/null || echo "0.1")
 
 Usage: nvpm <command> [options]
 
@@ -117,7 +137,7 @@ main() {
             "$NVPM_SRC/core/update.sh"
             ;;
         "version")
-            echo "nvpm version $(cat "$VERSION_FILE")"
+            echo "nvpm version $(cat "$VERSION_FILE" 2>/dev/null || echo "0.1")"
             ;;
         "help"|"--help"|"-h"|"")
             usage

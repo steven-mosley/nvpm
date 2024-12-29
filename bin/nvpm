@@ -5,7 +5,6 @@ set -e
 # Set NVPM_ROOT if not already set
 NVPM_ROOT="${NVPM_ROOT:-$HOME/.nvpm}"
 NVPM_SRC="${NVPM_SRC:-$NVPM_ROOT/src}"
-NVPM_REPO="https://github.com/steven-mosley/nvpm.git"
 VERSION_FILE="$NVPM_ROOT/version"
 
 # Load configuration, logging, and core functions
@@ -13,47 +12,6 @@ source "$NVPM_SRC/core/config.sh"
 source "$NVPM_SRC/core/logging.sh"
 source "$NVPM_SRC/core/profile.sh"
 source "$NVPM_SRC/ui/menu.sh"
-source "$NVPM_SRC/core/update.sh"
-
-# Function to fetch the latest version information from GitHub
-fetch_latest_version_info() {
-    local tmp_dir
-    tmp_dir=$(mktemp -d)
-    git clone --depth=1 "$NVPM_REPO" "$tmp_dir" >/dev/null 2>&1 || {
-        log_error "Failed to fetch the latest version information."
-        rm -rf "$tmp_dir"
-        return 1
-    }
-    
-    if [ -f "$tmp_dir/version" ]; then
-        cat "$tmp_dir/version"
-    else
-        log_error "Version file not found in the repository."
-        rm -rf "$tmp_dir"
-        return 1
-    fi
-
-    rm -rf "$tmp_dir"
-}
-
-# Function to check for updates
-check_for_updates() {
-    local remote_version local_version
-
-    # Fetch remote version information
-    remote_version=$(fetch_latest_version_info) || return 1
-
-    # Check if local version file exists, if not create it with version 0.1
-    if [ ! -f "$VERSION_FILE" ]; then
-        echo "0.1" > "$VERSION_FILE"
-    fi
-    local_version=$(cat "$VERSION_FILE")
-
-    # Compare versions and notify the user if an update is available
-    if [ "$remote_version" != "$local_version" ]; then
-        log_info "A new version ($remote_version) is available. Run 'nvpm update' to update."
-    fi
-}
 
 # Show usage information
 usage() {
@@ -69,7 +27,6 @@ Commands:
     remove <name>                  Remove a profile
     current                        Show current active profile
     exec <program>                 Execute the given program with the NVIM_APPNAME set
-    update                         Update NVPM to the latest version
     version                        Show NVPM version
     help                           Show this help message
 
@@ -79,7 +36,6 @@ Examples:
     nvpm global my-config
     nvpm remove my-config
     nvpm exec nvim
-    nvpm update
 
 For more information, visit: https://github.com/steven-mosley/nvpm
 EOF
@@ -104,11 +60,6 @@ exec_nvim() {
 
 # Main entry point
 main() {
-    # Only check for updates if the command is not exec
-    if [[ "$1" != "exec" && "$1" != "update" ]]; then
-        check_for_updates
-    fi
-
     # Execute the appropriate command
     case "$1" in
         "create")
@@ -134,9 +85,6 @@ main() {
                 usage
                 exit 1
             fi
-            ;;
-        "update")
-            update_nvpm
             ;;
         "version")
             echo "nvpm version $(cat "$VERSION_FILE" 2>/dev/null || echo "0.1")"

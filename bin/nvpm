@@ -46,7 +46,7 @@ Usage: nvpm <command> [options]
 Commands:
     create <name>                  Create a new Neovim profile
     list                           List all available profiles
-    switch <name>                  Switch to a specific profile
+    global <name>                  Set a system wide global profile
     remove <name>                  Remove a profile
     current                        Show current active profile
     version                        Show NVPM version

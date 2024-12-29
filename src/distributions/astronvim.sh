@@ -27,8 +27,14 @@ install_astronvim() {
         rm -rf "$config_dir"
     fi
 
-    mkdir -p "$config_dir"
-    echo 'print("Welcome to your AstroNvim profile!")' > "$config_dir/init.lua"
+    # Clone AstroNvim template
+    if ! git clone --depth 1 https://github.com/AstroNvim/template "$config_dir"; then
+        log_error "Failed to clone AstroNvim template repository"
+        return 1
+    fi
+
+    # Remove .git directory
+    rm -rf "$config_dir/.git"
     
     log_success "AstroNvim installed successfully!"
     log_info "You can now run 'nvim' with your new AstroNvim configuration"

@@ -104,8 +104,8 @@ exec_nvim() {
 
 # Main entry point
 main() {
-    # Check for updates only if the command is not exec
-    if [[ "$1" != "exec" ]]; then
+    # Only check for updates if the command is not exec
+    if [[ "$1" != "exec" && "$1" != "update" ]]; then
         check_for_updates
     fi
 

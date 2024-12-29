@@ -69,7 +69,7 @@ exec_nvim() {
     local program="$1"
     shift
 
-    # Determine the active profile (this can be extended to read from a config or similar)
+    # Determine the active profile
     local active_profile_name
     active_profile_name="$(cat "$NVPM_ROOT/global_profile" 2>/dev/null || echo "default")"
     
@@ -78,7 +78,7 @@ exec_nvim() {
         exit 1
     fi
     
-    exec "$NVPM_ROOT/wrappers/$active_profile_name" "$@"
+    NVIM_APPNAME="nvpm/$active_profile_name" exec /usr/bin/nvim "$@"
 }
 
 # Main entry point
@@ -110,7 +110,13 @@ main() {
                 current_profile
                 ;;
             "exec")
-                exec_nvim "${@:2}"
+                if [[ "$2" == "nvim" ]]; then
+                    exec_nvim "${@:3}"
+                else
+                    log_error "Unknown exec target: $2"
+                    usage
+                    exit 1
+                fi
                 ;;
             "version")
                 echo "nvpm version $NVPM_VERSION"

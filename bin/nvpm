@@ -32,9 +32,9 @@ ${CYAN}${BOLD}Commands:${NC}
         ${GREEN}current${NC}                        Show current active profile
 
     ${MAGENTA}${BOLD}Profile Maintenance:${NC}
-        ${GREEN}clearstate${NC} ${YELLOW}<name>${NC}                    Clear the state of a profile
-        ${GREEN}clearshare${NC} ${YELLOW}<name>${NC}                    Clear the share of a profile
-        ${GREEN}clearcache${NC} ${YELLOW}<name>${NC}                    Clear the cache of a profile
+        ${GREEN}clearstate${NC} ${YELLOW}<name>${NC}              Clear the state of a profile
+        ${GREEN}clearshare${NC} ${YELLOW}<name>${NC}              Clear the share of a profile
+        ${GREEN}clearcache${NC} ${YELLOW}<name>${NC}              Clear the cache of a profile
 
 
     ${BLUE}${BOLD}Shim Executor:${NC}

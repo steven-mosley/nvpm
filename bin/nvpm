@@ -55,7 +55,10 @@ exec_nvim() {
         exit 1
     fi
     
-    NVIM_APPNAME="nvpm/$active_profile_name" exec /usr/bin/nvim "$@"
+    export NVIM_APPNAME="nvpm/$active_profile_name"
+    echo "NVIM_APPNAME=${NVIM_APPNAME}"  # Debug print
+    echo "Executing: /usr/bin/nvim $@"  # Debug print
+    exec /usr/bin/nvim "$@"
 }
 
 # Main entry point

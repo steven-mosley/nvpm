@@ -16,28 +16,42 @@ source "$NVPM_SRC/ui/menu.sh"
 # Show usage information
 usage() {
     cat << EOF
-NVPM - Neovim Profile Manager v$(cat "$VERSION_FILE" 2>/dev/null || echo "0.1")
+${BLUE}${BOLD}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃         Neovim Profile Manager         ┃
+┃              v$(cat "$VERSION_FILE" 2>/dev/null || echo "0.1")                    ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}
 
-Usage: nvpm <command> [options]
+${BOLD}Usage:${NC} nvpm ${YELLOW}<command>${NC} [options]
 
-Commands:
-    create <name>                  Create a new Neovim profile
-    list                           List all available profiles
-    global <name>                  Set a system wide global profile
-    remove <name>                  Remove a profile
-    current                        Show current active profile
-    exec <program>                 Execute the given program with the NVIM_APPNAME set
-    version                        Show NVPM version
-    help                           Show this help message
+${CYAN}${BOLD}Commands:${NC}
+    ${YELLOW}${BOLD}Profile Management:${NC}
+        ${GREEN}create${NC} ${YELLOW}<name>${NC}                  Create a new Neovim profile
+        ${GREEN}list${NC}                           List all available profiles
+        ${GREEN}global${NC} ${YELLOW}<name>${NC}                  Set a system wide global profile
+        ${GREEN}remove${NC} ${YELLOW}<name>${NC}                  Remove a profile
+        ${GREEN}current${NC}                        Show current active profile
 
-Examples:
-    nvpm create my-config
+    ${MAGENTA}${BOLD}Profile Maintenance:${NC}
+        ${GREEN}clearstate${NC}                     Clear the state of a profile
+        ${GREEN}clearshare${NC}                     Clear the share of a profile
+        ${GREEN}clearcache${NC}                     Clear the cache of a profile
+
+
+    ${BLUE}${BOLD}Shim Executor:${NC}
+        ${GREEN}exec${NC} ${YELLOW}<program>${NC}                 Execute the given program with the NVIM_APPNAME set
+
+    ${CYAN}${BOLD}About${NC}
+        ${GREEN}version${NC}                        Show NVPM version
+        ${GREEN}help${NC}                           Show this help message
+
+${YELLOW}${BOLD}Examples:${NC}
+    ${DIM}nvpm create my-config
     nvpm list
     nvpm global my-config
     nvpm remove my-config
-    nvpm exec nvim
+    nvpm exec nvim${NC}
 
-For more information, visit: https://github.com/steven-mosley/nvpm
+${BOLD}For more information, visit:${NC} ${BLUE}${UNDERLINE}https://github.com/steven-mosley/nvpm${NC}
 EOF
 }
 
@@ -98,6 +112,15 @@ main() {
             ;;
         "remove")
             remove_profile "${@:2}"
+            ;;
+        "clearshare")
+            remove_share "${@:2}"
+            ;;
+        "clearstate")
+            remove_state "${@:2}"
+            ;;
+        "clearcache")
+            remove_cache "${@:2}"
             ;;
         "current")
             current_profile

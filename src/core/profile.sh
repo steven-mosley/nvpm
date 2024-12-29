@@ -4,6 +4,12 @@ source "${BASH_SOURCE%/*}/logging.sh"
 source "${BASH_SOURCE%/*}/config.sh"
 source "${BASH_SOURCE%/*}/../ui/menu.sh"
 
+local wrapper_path="$NVPM_ROOT/wrappers/$profile_name"
+local config_path="$HOME/.config/nvpm/$profile_name"
+local cache_path="$HOME/.cache/nvpm/$profile_name"
+local state_path="$HOME/.local/state/nvpm/$profile_name"
+local share_path="$HOME/.local/share/nvpm/$profile_name"
+
 # List available profiles
 list_profiles() {
     local wrapper_dir="$NVPM_ROOT/wrappers"
@@ -39,8 +45,6 @@ remove_profile() {
         return 1
     fi
 
-    local wrapper_path="$NVPM_ROOT/wrappers/$profile_name"
-    local config_path="$HOME/.config/nvpm/$profile_name"
 
     if [ ! -f "$wrapper_path" ]; then
         log_error "Profile '$profile_name' does not exist"
@@ -53,7 +57,12 @@ remove_profile() {
     # Remove config directory if it exists
     if [ -d "$config_path" ]; then
         rm -rf "$config_path"
+        rm -rf "$cache_path"
+        rm -rf "$state_path"
+        rm -rf "$share_path"
     fi
+
+
 
     # Set the global profile to system
     echo "system" > "$NVPM_ROOT/global_profile"
@@ -156,4 +165,64 @@ create_profile() {
     create_profile_wrapper "$profile_name"
 
     log_success "Profile '$profile_name' created successfully!"
+}
+
+delete_cache() {
+    local profile_name="$1"
+
+    if [ -z "$profile_name" ]; then
+        log_error "Profile name is required"
+        return 1
+    fi
+
+    if [ ! -f "$cache_path" ]; then
+        log_error "There is no cache for '$profile_name'."
+        return 1
+    else
+        log_info "Removing cache for '$profile_name'."
+        rm -rf "$cache_path"
+        if ! -f $cache_path; then
+            log_success "Cache for '$profile_name' successfully deleted."
+        fi
+    fi
+}
+
+delete_state() {
+    local profile_name="$1"
+
+    if [ -z "$profile_name" ]; then
+        log_error "Profile name is required"
+        return 1
+    fi
+
+    if [ ! -f "$state_path" ]; then
+        log_error "There is no state for '$profile_name'."
+        return 1
+    else
+        log_info "Removing state for '$profile_name'."
+        rm -rf "$state_path"
+        if ! -f $state_path; then
+            log_success "State for '$profile_name' successfully deleted."
+        fi
+    fi
+}
+
+delete_share() {
+    local profile_name="$1"
+
+    if [ -z "$_name" ]; then
+        log_error "Profile name is required"
+        return 1
+    fi
+
+    if [ ! -f "$share_path" ]; then
+        log_error "There is no share data for '$profile_name'."
+        return 1
+    else
+        log_info "Removing share data for '$profile_name'."
+        rm -rf "$share_path"
+        if ! -f $share_path; then
+            log_success "Share data for '$profile_name' successfully deleted."
+        fi
+    fi
 }

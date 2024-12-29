@@ -2,10 +2,11 @@
 
 set -e
 
-# Set NVPM_ROOT and NVPM_CACHE if not already set
+# Set NVPM_ROOT if not already set
 NVPM_ROOT="${NVPM_ROOT:-$HOME/.nvpm}"
-NVPM_CACHE="${NVPM_CACHE:-$NVPM_ROOT/cache}"
 NVPM_SRC="${NVPM_SRC:-$NVPM_ROOT/src}"
+NVPM_REPO="https://github.com/steven-mosley/nvpm.git"
+VERSION_FILE="$NVPM_ROOT/version"
 
 # Load configuration, logging, and core functions
 source "$NVPM_SRC/core/config.sh"
@@ -13,33 +14,31 @@ source "$NVPM_SRC/core/logging.sh"
 source "$NVPM_SRC/core/profile.sh"
 source "$NVPM_SRC/ui/menu.sh"
 
-# Fetch the latest scripts from GitHub
-fetch_latest_scripts() {
-    log_info "Fetching the latest scripts from GitHub..."
+# Function to fetch the latest version information from GitHub
+fetch_latest_version_info() {
+    # Clone the repository to a temporary directory to fetch the latest version file
+    local tmp_dir
+    tmp_dir=$(mktemp -d)
+    git clone --depth=1 "$NVPM_REPO" "$tmp_dir" >/dev/null 2>&1
+    cat "$tmp_dir/version"
+    rm -rf "$tmp_dir"
+}
 
-    # Ensure NVPM_CACHE is set
-    if [ -z "$NVPM_CACHE" ]; then
-        log_error "NVPM_CACHE is not set"
-        exit 1
+# Function to check for updates
+check_for_updates() {
+    local remote_version local_version
+    remote_version=$(fetch_latest_version_info)
+    local_version=$(cat "$VERSION_FILE")
+
+    if [ "$remote_version" != "$local_version" ]; then
+        log_info "A new version ($remote_version) is available. Run 'nvpm update' to update."
     fi
-
-    # Create necessary directories
-    mkdir -p "$NVPM_CACHE"
-
-    # Clone or update the repository in the cache directory
-    if [ -d "$NVPM_CACHE/nvpm" ]; then
-        git -C "$NVPM_CACHE/nvpm" pull origin main >/dev/null 2>&1
-    else
-        git clone "$NVPM_REPO" "$NVPM_CACHE/nvpm" >/dev/null 2>&1
-    fi
-
-    log_success "Fetched the latest scripts from GitHub"
 }
 
 # Show usage information
 usage() {
     cat << EOF
-NVPM - Neovim Profile Manager v${NVPM_VERSION}
+NVPM - Neovim Profile Manager v$(cat "$VERSION_FILE")
 
 Usage: nvpm <command> [options]
 
@@ -50,6 +49,7 @@ Commands:
     remove <name>                  Remove a profile
     current                        Show current active profile
     exec <program>                 Execute the given program with the NVIM_APPNAME set
+    update                         Update NVPM to the latest version
     version                        Show NVPM version
     help                           Show this help message
 
@@ -59,6 +59,7 @@ Examples:
     nvpm global my-config
     nvpm remove my-config
     nvpm exec nvim
+    nvpm update
 
 For more information, visit: https://github.com/steven-mosley/nvpm
 EOF
@@ -83,55 +84,51 @@ exec_nvim() {
 
 # Main entry point
 main() {
-    # Check if the fetch should be skipped
-    if [[ " $* " != *" --skip-fetch "* ]]; then
-        # Fetch the latest scripts
-        fetch_latest_scripts
-        # Re-run the script with --skip-fetch to prevent fetching again
-        exec "$0" "$@" --skip-fetch
-    else
-        # Remove the --skip-fetch flag from the arguments
-        set -- "${@/--skip-fetch/}"
-        # Execute the appropriate command
-        case "$1" in
-            "create")
-                create_profile "${@:2}"
-                ;;
-            "list")
-                list_profiles
-                ;;
-            "global")
-                global_profile "${@:2}"
-                ;;
-            "remove")
-                remove_profile "${@:2}"
-                ;;
-            "current")
-                current_profile
-                ;;
-            "exec")
-                if [[ "$2" == "nvim" ]]; then
-                    exec_nvim "${@:3}"
-                else
-                    log_error "Unknown exec target: $2"
-                    usage
-                    exit 1
-                fi
-                ;;
-            "version")
-                echo "nvpm version $NVPM_VERSION"
-                ;;
-            "help"|"--help"|"-h"|"")
-                usage
-                ;;
-            *)
-                # Display error message and usage, do not re-run the script
-                log_error "Unknown command: $1"
+    # Check for updates
+    check_for_updates
+
+    # Execute the appropriate command
+    case "$1" in
+        "create")
+            create_profile "${@:2}"
+            ;;
+        "list")
+            list_profiles
+            ;;
+        "global")
+            global_profile "${@:2}"
+            ;;
+        "remove")
+            remove_profile "${@:2}"
+            ;;
+        "current")
+            current_profile
+            ;;
+        "exec")
+            if [[ "$2" == "nvim" ]]; then
+                exec_nvim "${@:3}"
+            else
+                log_error "Unknown exec target: $2"
                 usage
                 exit 1
-                ;;
-        esac
-    fi
+            fi
+            ;;
+        "update")
+            "$NVPM_SRC/core/update.sh"
+            ;;
+        "version")
+            echo "nvpm version $(cat "$VERSION_FILE")"
+            ;;
+        "help"|"--help"|"-h"|"")
+            usage
+            ;;
+        *)
+            # Display error message and usage, do not re-run the script
+            log_error "Unknown command: $1"
+            usage
+            exit 1
+            ;;
+    esac
 }
 
 # Run the main function with all arguments

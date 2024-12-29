@@ -50,15 +50,14 @@ exec_nvim() {
     local active_profile_name
     active_profile_name="$(cat "$NVPM_ROOT/global_profile" 2>/dev/null || echo "default")"
     
-    if [ ! -f "$NVPM_ROOT/wrappers/$active_profile_name" ]; then
+    local wrapper_script="$NVPM_ROOT/wrappers/$active_profile_name"
+    if [ ! -f "$wrapper_script" ]; then
         log_error "Wrapper script does not exist for profile: $active_profile_name"
         exit 1
     fi
     
-    export NVIM_APPNAME="nvpm/$active_profile_name"
-    echo "NVIM_APPNAME=${NVIM_APPNAME}"  # Debug print
-    echo "Executing: /usr/bin/nvim $@"  # Debug print
-    exec /usr/bin/nvim "$@"
+    echo "Executing wrapper script: $wrapper_script $@"  # Debug print
+    exec "$wrapper_script" "$@"
 }
 
 # Main entry point

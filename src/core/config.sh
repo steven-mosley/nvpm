@@ -13,6 +13,7 @@ declare -A DISTRIBUTION_URLS=(
     ["nvchad"]="https://github.com/NvChad/starter"
     ["lazyvim"]="https://github.com/LazyVim/starter"
     ["kickstart"]="https://github.com/nvim-lua/kickstart.nvim.git"
+    ["kickstart-modular"]="https://github.com/dam9000/kickstart-modular.nvim"
 )
 
 # Distribution names for display

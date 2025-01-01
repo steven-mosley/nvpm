@@ -88,7 +88,7 @@ setup_shell() {
             echo >> "$shell_config"
             echo '# NVPM initialization' >> "$shell_config"
             echo 'export NVPM_ROOT="$HOME/.nvpm"' >> "$shell_config"
-            echo 'export PATH="$NVPM_ROOT/bin:$NVPM_ROOT/shims:$PATH"' >> "$shell_config"
+            echo 'export PATH="$NVPM_ROOT/bin:$NVPM_ROOT/shims:$NVPM_ROOT/wrappers:$PATH"' >> "$shell_config"
         fi
     fi
 }
